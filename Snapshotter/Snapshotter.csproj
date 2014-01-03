@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{33481A0F-783C-40D3-BBDC-EF99DBB9A9E8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Cloudoman.AwsTools.Snapshotter</RootNamespace>
+    <AssemblyName>Snapshotter</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProductVersion>12.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>0219 0414</NoWarn>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AlphaShadow">
+      <HintPath>packages\AlphaVSS.1.2.4000.3\lib\net40\AlphaShadow.exe</HintPath>
+    </Reference>
+    <Reference Include="AlphaVSS.51.x86">
+      <HintPath>packages\AlphaVSS.1.2.4000.3\lib\net40\AlphaVSS.51.x86.dll</HintPath>
+    </Reference>
+    <Reference Include="AlphaVSS.52.x64">
+      <HintPath>packages\AlphaVSS.1.2.4000.3\lib\net40\AlphaVSS.52.x64.dll</HintPath>
+    </Reference>
+    <Reference Include="AlphaVSS.52.x86">
+      <HintPath>packages\AlphaVSS.1.2.4000.3\lib\net40\AlphaVSS.52.x86.dll</HintPath>
+    </Reference>
+    <Reference Include="AlphaVSS.60.x64">
+      <HintPath>packages\AlphaVSS.1.2.4000.3\lib\net40\AlphaVSS.60.x64.dll</HintPath>
+    </Reference>
+    <Reference Include="AlphaVSS.60.x86">
+      <HintPath>packages\AlphaVSS.1.2.4000.3\lib\net40\AlphaVSS.60.x86.dll</HintPath>
+    </Reference>
+    <Reference Include="AlphaVSS.Common">
+      <HintPath>packages\AlphaVSS.1.2.4000.3\lib\net40\AlphaVSS.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="AWSSDK, Version=1.5.30.1, Culture=neutral, PublicKeyToken=9f476d3089b52be3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\AWSSDK.1.5.30.1\lib\AWSSDK.dll</HintPath>
+    </Reference>
+    <Reference Include="PowerArgs">
+      <HintPath>packages\PowerArgs.1.8.0.0\lib\net40\PowerArgs.dll</HintPath>
+    </Reference>
+    <Reference Include="SnapshotQuery">
+      <HintPath>packages\AlphaVSS.1.2.4000.3\lib\net40\SnapshotQuery.exe</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BackupManager.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Helpers\AwsDeviceMapping.cs" />
+    <Compile Include="Helpers\AwsDevices.cs" />
+    <Compile Include="Helpers\Logger.cs" />
+    <Compile Include="Models\BackupRequest.cs" />
+    <Compile Include="Models\RestoreRequest.cs" />
+    <Compile Include="Models\SnapshotInfo.cs" />
+    <Compile Include="Models\StorageInfo.cs" />
+    <Compile Include="Models\VolumeInfo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RestoreManager.cs" />
+    <Compile Include="Helpers\InstanceInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DiskPart\DiskPart.csproj">
+      <Project>{c60e1dee-5799-4d75-9559-5849a0256e9d}</Project>
+      <Name>DiskPart</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.4.5">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 4.5</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="sync.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
