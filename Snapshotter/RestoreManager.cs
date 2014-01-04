@@ -302,7 +302,7 @@ namespace Cloudoman.AwsTools.Snapshotter
                         new Tag{Key="InstanceID", Value=InstanceInfo.InstanceId},
                         new Tag{Key="DeviceName", Value=snapshot.DeviceName},
                         new Tag{Key="Drive", Value=snapshot.Drive},
-                        new Tag{Key="Name", Value="Snapshotter Restore: " + _backupName + " Drive, " + snapshot.Drive},
+                        new Tag{Key="Name", Value="Snapshotter BackupName: " + _backupName + " Drive, " + snapshot.Drive},
                         new Tag{Key="BackupName", Value=_backupName},
                     }
                 };
