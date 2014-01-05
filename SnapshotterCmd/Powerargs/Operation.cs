@@ -13,7 +13,7 @@ namespace Cloudoman.AwsTools.SnapshotterCmd.Powerargs
         readonly string _operation;
 
         // List valid options
-        static readonly IEnumerable<string> Options = new List<string>{"backup", "restore", "list"};
+        static readonly IEnumerable<string> Options = new List<string>{"backup", "restore", "listsnapshots","listvolumes"};
 
         // Format into readable help message
         private const string HelpMessage = "Invalid Operation Specified. Must be 'backup' or 'restore' or 'list'";

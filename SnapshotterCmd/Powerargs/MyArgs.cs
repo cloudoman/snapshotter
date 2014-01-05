@@ -6,7 +6,7 @@ namespace Cloudoman.AwsTools.SnapshotterCmd.Powerargs
     public class MyArgs
     {
         [ArgRequired]
-        [ArgDescription("Operation is either 'backup' or 'restore' or 'list'")]
+        [ArgDescription("Operation is either 'backup', 'restore', 'listsnapshots' or 'listvolumes'")]
         public Operation Operation { get; set; }
 
         [ArgDescription("A name for your backup. Defaults to this EC2 instance's 'name' tag or hostname if unspecified.This name is an AWS resource tag used to either tag or find your snapshots")]
@@ -23,6 +23,9 @@ namespace Cloudoman.AwsTools.SnapshotterCmd.Powerargs
 
         [ArgDescription("Backup operation only tags attached volumes with metadata. Does not create snapshots")]
         public bool TagOnly { get; set; }
+
+        [ArgDescription("Restore operation only attaches existing volumes if any. Does not create volume from snapshots")]
+        public bool AttachOnly { get; set; }
 
     }
 

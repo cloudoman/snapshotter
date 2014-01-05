@@ -11,5 +11,6 @@ namespace Cloudoman.AwsTools.Snapshotter.Models
         public string BackupName { get; set; }
         public bool WhatIf { get; set; }
         public bool ForceDetach { get; set; }
+        public bool AttachOnly { get; set; }
     }
 }

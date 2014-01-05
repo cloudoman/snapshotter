@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading;
 using Cloudoman.DiskTools;
 
-
 namespace Cloudoman.AwsTools.Snapshotter
 {
     public class RestoreManager
@@ -15,6 +14,7 @@ namespace Cloudoman.AwsTools.Snapshotter
         private readonly string _backupName;
         private readonly string _timeStamp;
         private readonly IEnumerable<SnapshotInfo> _allSnapshots;
+        private readonly IEnumerable<VolumeInfo> _allVolumes;
         private readonly RestoreRequest _request;
 
         public RestoreManager(RestoreRequest request)
@@ -32,21 +32,34 @@ namespace Cloudoman.AwsTools.Snapshotter
             }
 
 
-            // Get All Snapshots with given backup name
-            _allSnapshots = GetAllSnapshots();
-            if (_allSnapshots.ToList().Count == 0 )
+            if (_request.AttachOnly)
             {
-                var message = "No snapshots were found for BackupName:" + _backupName + " and timestamp: " + _timeStamp + ".Exitting"; 
-                Logger.Info(message, "RestoreManager");
-                return;
+                _allVolumes = GetAllVolumes();
+            }
+            else
+            {
+                // Get All Snapshots with given backup name
+                _allSnapshots = GetAllSnapshots();
+                if (_allSnapshots.ToList().Count == 0)
+                {
+                    var message = "No snapshots were found for BackupName:" + _backupName + " and timestamp: " + _timeStamp + ".Exitting";
+                    Logger.Info(message, "RestoreManager");
+                    return;
+                }
             }
 
             // Get timestamp from Request or default to latest in _snapshotInfo
             _timeStamp = _request.TimeStamp;
             if (String.IsNullOrEmpty(_timeStamp)) _timeStamp = null;
-            if (_timeStamp == null && GetLatestSnapshotTimeStamp() == null)
+
+            if (_request.AttachOnly)
+                _timeStamp = GetLatestVolumeTimeStamp();
+            else
+                _timeStamp = GetLatestSnapshotTimeStamp();
+
+            if (_timeStamp == null)
             {
-                var message = "No timestamp was explicitly provided. Unable to determine the timestamp of the latest snapshot. Exitting.";
+                var message = "No timestamp was explicitly provided. Unable to determine the timestamp of the latest snapshot or volume. Exitting.";
                 Logger.Error(message, "RestoreManager");
             }
 
@@ -82,6 +95,39 @@ namespace Cloudoman.AwsTools.Snapshotter
             return snapshotsInfo;
         }
 
+        IEnumerable<VolumeInfo> GetAllVolumes()
+        {
+            var filters = new List<Filter> {
+                new Filter {Name = "tag:BackupName", Value = new List<string> { _backupName }},
+            };
+
+            var request = new DescribeVolumesRequest { Filter = filters };
+            var response = InstanceInfo.Ec2Client.DescribeVolumes(request);
+            if (response.DescribeVolumesResult.Volume.Count == 0)
+            {
+                Logger.Info("No existing volumes were found for given backupName:" + _backupName, "RestoreManager.GetVolumeSet");
+                return null;
+            }
+
+            var volumes = response.DescribeVolumesResult.Volume;
+            var volumesinfo = new List<VolumeInfo>();
+
+            volumes.ForEach(x =>
+                volumesinfo.Add(new VolumeInfo
+                {
+                    BackupName = x.Tag.Get("BackupName"),
+                    DeviceName = x.Tag.Get("DeviceName"),
+                    Drive = x.Tag.Get("Drive"),
+                    Hostname = x.Tag.Get("HostName"),
+                    TimeStamp = x.Tag.Get("TimeStamp"),
+                    VolumeId = x.VolumeId
+                })
+            );
+
+            return volumesinfo ?? null;
+        }
+
+
         string GetLatestSnapshotTimeStamp()
         {
             var newest = _allSnapshots.Max(x => Convert.ToDateTime(x.TimeStamp));
@@ -92,10 +138,10 @@ namespace Cloudoman.AwsTools.Snapshotter
             return something;
         }
 
-        string GetOldestSnapshotTimeStamp()
+        string GetLatestVolumeTimeStamp()
         {
-            var oldest = _allSnapshots.Min(x => Convert.ToDateTime(x.TimeStamp));
-            return _allSnapshots
+            var oldest = _allVolumes.Min(x => Convert.ToDateTime(x.TimeStamp));
+            return _allVolumes
                         .Where(x => Convert.ToDateTime(x.TimeStamp) == oldest)
                         .Select(x => x.TimeStamp).FirstOrDefault();
         }
@@ -107,11 +153,20 @@ namespace Cloudoman.AwsTools.Snapshotter
         /// <returns></returns>
         public List<SnapshotInfo> GetSnapshotSet()
         {
-            // Filter list by timestamp and order ascending
-            var timeStamp = _timeStamp ?? GetLatestSnapshotTimeStamp();
             return _allSnapshots
-                    .Where(x => Convert.ToDateTime(x.TimeStamp) == Convert.ToDateTime(timeStamp))
+                    .Where(x => Convert.ToDateTime(x.TimeStamp) == Convert.ToDateTime(_timeStamp))
                     .OrderByDescending(x => Convert.ToDateTime(x.TimeStamp)).ToList();
+        }
+
+        /// <summary>
+        /// Retrieves list of existing volumes filtered by BackupName that
+        /// need to be attached to this instance
+        /// </summary>
+        public List<VolumeInfo> GetVolumeSet()
+        {
+            return _allVolumes
+                        .Where(x => Convert.ToDateTime(x.TimeStamp) == Convert.ToDateTime(_timeStamp))
+                        .OrderByDescending(x => Convert.ToDateTime(x.TimeStamp)).ToList(); 
         }
 
         public void StartRestore()
@@ -127,78 +182,121 @@ namespace Cloudoman.AwsTools.Snapshotter
             // Output Volume Info header
             Console.WriteLine(new VolumeInfo().FormattedHeader);
 
-            // Find Snapshots to Restore based on timestamp
-            var snapshots = GetSnapshotSet();
-            snapshots.ToList().ForEach(x =>
+
+
+
+            // Check restore type
+            if (!_request.AttachOnly)
             {
-                // Output volume info being restored
-                Console.WriteLine(x.ToString());
+                // Re-attach appropriate volumes
+                var volumes = GetVolumeSet();
+                volumes.ForEach(x =>
+                {
+                    CreateDrive(x, x.VolumeId);
+                });
+            }
+            else 
+            {
+                // Find Snapshots to Restore based on timestamp
+                var snapshots = GetSnapshotSet();
 
-                // Restore each snapshot in the sanpshot set
-                if (!_request.WhatIf) RestoreVolume(x);
-            });
+                // Create volume then attach
+                snapshots.ToList().ForEach(x =>
+                {
 
+                    // Output volume info being restored
+                    Console.WriteLine(x.ToString());
+
+                    // Restore each snapshot in the set
+                    if (!_request.WhatIf)
+                    {
+                        // Create New Volume and Tag it
+                        Logger.Info("Restore Volume:" + x.SnapshotId, "RestoreManager.StartRestore");
+
+                        var volumeId = CreateVolume(x);
+                        TagVolume(x, volumeId);
+                        CreateDrive(x, volumeId);
+                    }
+                });
+            }
             Logger.Info("Restore Ended", "RestoreManager.StartRestore");
         }
 
-        public void RestoreVolume(SnapshotInfo snapshot)
+        
+        public void CreateDrive(StorageInfo storageInfo, string volumeId)
         {
             var diskNumber=0;
 
-            Logger.Info("Restore Volume:" + snapshot.SnapshotId, "RestoreManager.RestoreVolume");
-
-            // Create New Volume and Tag it
-            var volumeId = CreateVolume(snapshot);
-            TagVolume(snapshot, volumeId);
+            Logger.Info("Create Drive:" + storageInfo.Drive, "RestoreManager.CreateDrive");
 
             // Detach Volumes as appropriate
-            var volume = VolumeAtDevice(snapshot);
+            ReleaseAwsDevice(storageInfo);
+
+            //Attach new volume
+            var newDisk = AttachVolume(storageInfo, volumeId);
+ 
+            // Online Disk New Disk
+            OnlineDrive(newDisk.Num, storageInfo.Drive);
+
+
+            // Set Delete on termination to TRUE for restored volume
+            SetDeleteOnTermination(storageInfo.DeviceName, true);
+        }
+
+        void ReleaseAwsDevice(StorageInfo storageInfo)
+        {
+            var diskNumber = 0;
+
+            // Detach Volumes as appropriate
+            var volume = VolumeAtDevice(storageInfo);
             if (volume != null)
             {
                 // Find the Windows physical disk number attached to the AWS device (snapshot.DeviceName)
-                var mapping = AwsDevices.GetMapping(snapshot.DeviceName);
+                var mapping = AwsDevices.GetMapping(storageInfo.DeviceName);
                 diskNumber = mapping.DiskNumber;
 
                 if (_request.ForceDetach)
                 {
                     // Offline Disk assocated with required device
-                    OfflineDisk(mapping.DiskNumber);                    
+                    OfflineDisk(mapping.DiskNumber);
                     DetachVolume(mapping.VolumeId, mapping.Device);
                 }
                 else
                 {
-                    var message = "The AWS Device: " + snapshot.DeviceName +
+                    var message = "The AWS Device: " + storageInfo.DeviceName +
                                   " is currently attached to another volume on this server. Please detach volume before restore or set ForceDetach to true";
 
                     Logger.Error(message, "RestoreManager.RestoreVolume");
                     return;
                 }
             }
-            //Attach new volume
-            var newDisk = AttachVolume(snapshot, volumeId);
- 
-            // Online Disk New Disk
-            OnlineDrive(newDisk.Num, snapshot.Drive);
-
-
-            // Set Delete on termination to TRUE for restored volume
-            SetDeleteOnTermination(snapshot.DeviceName, true);
         }
-
 
         /// <summary>
         /// Lists snapshots matching timestamp passed in via constructor.
         /// List all available snapshots when timestamp was omitted
         /// </summary>
-        public void List()
+        public void ListSnapshots()
         {
-            Logger.Info("Listing Snaphshots", "RestoreManager.List");
-            Logger.Info("Backup Name:" + _backupName, "RestoreManager.List");
+            Logger.Info("Listing Snaphshots", "RestoreManager.ListSnapshots");
+            Logger.Info("Backup Name:" + _backupName, "RestoreManager.ListSnapshots");
             Console.WriteLine(new SnapshotInfo().FormattedHeader);
             if (_timeStamp == null)
                 _allSnapshots.ToList().ForEach(Console.WriteLine);
             else
                 GetSnapshotSet().ToList().ForEach(Console.WriteLine);
+        }
+
+        /// <summary>
+        /// Lists snapshots matching timestamp passed in via constructor.
+        /// List all available snapshots when timestamp was omitted
+        /// </summary>
+        public void ListVolumes()
+        {
+            Logger.Info("Listing Volumes", "RestoreManager.ListVolumes");
+            Logger.Info("Backup Name:" + _backupName, "RestoreManager.ListVolumes");
+            Console.WriteLine(new VolumeInfo().FormattedHeader);
+            GetVolumeSet().ForEach(Console.WriteLine);
         }
 
         void SetDeleteOnTermination(string DeviceName, bool deleteOnTermination)
@@ -286,7 +384,7 @@ namespace Cloudoman.AwsTools.Snapshotter
             return volumeId;
         }
 
-        void TagVolume(SnapshotInfo snapshot, string volumeId)
+        void TagVolume(SnapshotInfo snapshot, string volumeId, string namePrefix="Snapshotter BackupName")
         {
                         // Tag restored volume
             try
@@ -302,7 +400,7 @@ namespace Cloudoman.AwsTools.Snapshotter
                         new Tag{Key="InstanceID", Value=InstanceInfo.InstanceId},
                         new Tag{Key="DeviceName", Value=snapshot.DeviceName},
                         new Tag{Key="Drive", Value=snapshot.Drive},
-                        new Tag{Key="Name", Value="Snapshotter BackupName: " + _backupName + " Drive, " + snapshot.Drive},
+                        new Tag{Key="Name", Value=namePrefix + ":" + _backupName + " Drive, " + snapshot.Drive},
                         new Tag{Key="BackupName", Value=_backupName},
                     }
                 };
@@ -319,10 +417,10 @@ namespace Cloudoman.AwsTools.Snapshotter
 
         }
 
-        Volume VolumeAtDevice(SnapshotInfo snapshot)
+        Volume VolumeAtDevice(StorageInfo storeageInfo)
         {
             // Get AWS Device Name from Snapshot's AWS Resource Tag
-            var deviceName = snapshot.DeviceName;
+            var deviceName = storeageInfo.DeviceName;
 
             // Find volumes attached to device
             var currentVolume = InstanceInfo.Volumes.FirstOrDefault(x => x.Attachment[0].Device == deviceName);
@@ -405,7 +503,7 @@ namespace Cloudoman.AwsTools.Snapshotter
             Logger.Error("Error assigning drive letter.\n Diskpart Output:" + assignResponse.Output, "OnlineDrive");
         }
 
-        DiskTools.Models.Disk AttachVolume(SnapshotInfo snapshot, string volumeId)
+        DiskTools.Models.Disk AttachVolume(StorageInfo storageInfo, string volumeId)
         {
             var diskpart = new DiskPart();
             var disksBefore = diskpart.ListDisk();
@@ -413,12 +511,12 @@ namespace Cloudoman.AwsTools.Snapshotter
             // Attach volume to EC2 Instance
             try
             {
-                Logger.Info("Attaching Volume to Instance:" + volumeId +" @ Device:" + snapshot.DeviceName, "RestoreVolume");
+                Logger.Info("Attaching Volume to Instance:" + volumeId +" @ Device:" + storageInfo.DeviceName, "RestoreVolume");
                 var attachRequest = new AttachVolumeRequest
                 {
                     InstanceId = InstanceInfo.InstanceId,
                     VolumeId = volumeId,
-                    Device = snapshot.DeviceName
+                    Device = storageInfo.DeviceName
                 };
 
                 var result = InstanceInfo.Ec2Client.AttachVolume(attachRequest).AttachVolumeResult;

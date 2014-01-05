@@ -21,7 +21,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Tests
             var request = new RestoreRequest();
             request.BackupName = "web";
             var restoreManager = new RestoreManager(request);
-            restoreManager.List();
+            restoreManager.ListSnapshots();
 
         }
 

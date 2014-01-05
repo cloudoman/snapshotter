@@ -64,7 +64,7 @@ namespace Cloudoman.AwsTools.Snapshotter
             // Snapshot volumes or Tag Only
             Logger.Info("Job Started", "BackupManager");
             if (_request.TagOnly)
-                _volumesInfo.ForEach(x => TagResource(x.VolumeId, x));
+                _volumesInfo.ForEach(x => TagResource(x.VolumeId, x, namePrefix:"Snapshotter Tag:"));
             else 
                 BackupVolumes();
             Logger.Info("Job Ended", "BackupManager");
@@ -112,7 +112,7 @@ namespace Cloudoman.AwsTools.Snapshotter
             }
         }
 
-        void TagResource(string resourceId, VolumeInfo backupVolumeInfo)
+        void TagResource(string resourceId, VolumeInfo backupVolumeInfo, string namePrefix="Snapshotter BackupName")
         {
             // Create Tag Request
             var tagRequest = new CreateTagsRequest
@@ -125,7 +125,7 @@ namespace Cloudoman.AwsTools.Snapshotter
                         new Tag {Key = "InstanceId", Value = InstanceInfo.InstanceId},
                         new Tag {Key = "DeviceName", Value = backupVolumeInfo.DeviceName},
                         new Tag {Key = "Drive", Value = backupVolumeInfo.Drive},
-                        new Tag {Key = "Name", Value = "Snapshotter BackupName: " + _derivedBackupName + ", Drive: " + backupVolumeInfo.Drive},
+                        new Tag {Key = "Name", Value = namePrefix + ":" + _derivedBackupName + ", Drive: " + backupVolumeInfo.Drive},
                         new Tag {Key = "BackupName", Value = _derivedBackupName}
                     }
             };
