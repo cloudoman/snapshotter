@@ -52,10 +52,13 @@ namespace Cloudoman.AwsTools.Snapshotter
             _timeStamp = _request.TimeStamp;
             if (String.IsNullOrEmpty(_timeStamp)) _timeStamp = null;
 
-            if (_request.AttachOnly)
-                _timeStamp = GetLatestVolumeTimeStamp();
-            else
-                _timeStamp = GetLatestSnapshotTimeStamp();
+            if (_timeStamp == null)
+            {
+                if (_request.AttachOnly)
+                    _timeStamp = GetLatestVolumeTimeStamp();
+                else
+                    _timeStamp = GetLatestSnapshotTimeStamp();
+            }
 
             if (_timeStamp == null)
             {
@@ -186,7 +189,7 @@ namespace Cloudoman.AwsTools.Snapshotter
 
 
             // Check restore type
-            if (!_request.AttachOnly)
+            if (_request.AttachOnly)
             {
                 // Re-attach appropriate volumes
                 var volumes = GetVolumeSet();
