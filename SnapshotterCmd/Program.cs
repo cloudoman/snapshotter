@@ -48,7 +48,8 @@ namespace Cloudoman.AwsTools.SnapshotterCmd
                     case "listsnapshots":
                         var restoreRequest = new RestoreRequest {
                             BackupName = parsed.BackupName, 
-                            TimeStamp = parsed.TimeStamp 
+                            TimeStamp = parsed.TimeStamp,
+                            AttachOnly = parsed.AttachOnly
                         };
 
                         new RestoreManager(restoreRequest).ListSnapshots();
@@ -58,7 +59,8 @@ namespace Cloudoman.AwsTools.SnapshotterCmd
                         var restoreRequest2 = new RestoreRequest
                         {
                             BackupName = parsed.BackupName,
-                            TimeStamp = parsed.TimeStamp
+                            TimeStamp = parsed.TimeStamp,
+                            AttachOnly = parsed.AttachOnly
                         };
 
                         new RestoreManager(restoreRequest2).ListVolumes();

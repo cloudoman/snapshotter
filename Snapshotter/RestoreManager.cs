@@ -296,7 +296,7 @@ namespace Cloudoman.AwsTools.Snapshotter
             Logger.Info("Listing Volumes", "RestoreManager.ListVolumes");
             Logger.Info("Backup Name:" + _backupName, "RestoreManager.ListVolumes");
             Console.WriteLine(new VolumeInfo().FormattedHeader);
-            GetVolumeSet().ForEach(Console.WriteLine);
+            _allVolumes.ToList().ForEach(Console.WriteLine);
         }
 
         void SetDeleteOnTermination(string DeviceName, bool deleteOnTermination)
