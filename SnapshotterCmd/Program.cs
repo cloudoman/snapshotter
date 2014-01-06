@@ -51,13 +51,19 @@ namespace Cloudoman.AwsTools.SnapshotterCmd
                         break;
 
                     case "listsnapshots":
-                        var restoreRequest = new RestoreRequest {
-                            BackupName = parsed.BackupName, 
-                            TimeStamp = parsed.TimeStamp,
-                            AttachOnly = parsed.AttachOnly
-                        };
+                        //var restoreRequest = new RestoreRequest {
+                        //    BackupName = parsed.BackupName, 
+                        //    TimeStamp = parsed.TimeStamp,
+                        //    AttachOnly = parsed.AttachOnly
+                        //};
 
-                        new RestoreManager(restoreRequest).ListSnapshots();
+                        //new RestoreManager(restoreRequest).ListSnapshots();
+                        var listSnapshotsRequest = new ListSnapshotsRequest
+                        {
+                            BackupName = parsed.BackupName,
+                            TimeStamp = parsed.TimeStamp
+                        };
+                        new ListSnapshotsService(listSnapshotsRequest).ListSnapshots();
                         break;
 
                     case "listvolumes":
