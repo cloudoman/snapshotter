@@ -25,7 +25,7 @@ namespace Cloudoman.AwsTools.SnapshotterCmd
                 // Run requested operation
                 switch (operation)
                 {
-                    case "backup":
+                    case "snapshotvolumes":
 
                         var snapRequest = new SnapshotVolumesRequest { 
                             BackupName = parsed.BackupName, 
