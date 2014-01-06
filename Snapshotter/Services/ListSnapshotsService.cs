@@ -23,11 +23,12 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
             // Determine BackName used to tag snapshots
             DeriveBackupName();
 
+            // Get All exiting snapshots for given backup name
+            GetAllSnapshots();
+
             // Determine TimeStamp
             DeriveTimeStamp();
 
-            // Get All exiting snapshots for given backup name
-            GetAllSnapshots();
         }
 
 
@@ -52,12 +53,13 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
         void DeriveTimeStamp()
         {
             _derivedTimeStamp = _request.TimeStamp;
-            if (String.IsNullOrEmpty(_derivedTimeStamp)) _derivedTimeStamp = GetOldestSnapshotTimeStamp();
-            if (_derivedTimeStamp == null)
-            {
-                var message = "No timestamp was explicitly provided. Unable to determine the timestamp of the oldest snapshot. Exitting.";
-                Logger.Error(message, "ListSnapshotsService.DeriveTimeStamp");
-            }
+            if (String.IsNullOrEmpty(_derivedTimeStamp)) _derivedTimeStamp = null;
+            //if (String.IsNullOrEmpty(_derivedTimeStamp)) _derivedTimeStamp = GetOldestSnapshotTimeStamp();
+            //if (_derivedTimeStamp == null)
+            //{
+            //    var message = "No timestamp was explicitly provided. Unable to determine the timestamp of the oldest snapshot. Exitting.";
+            //    Logger.Error(message, "ListSnapshotsService.DeriveTimeStamp");
+            //}
         }
 
         string GetOldestSnapshotTimeStamp()
@@ -83,10 +85,15 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
             Console.WriteLine(new SnapshotInfo().FormattedHeader);
 
             // Output Snapshots
-            _allSnapshots
-                .Where(x => Convert.ToDateTime(x.TimeStamp) >= Convert.ToDateTime(_derivedTimeStamp))
-                .OrderByDescending(x => Convert.ToDateTime(x.TimeStamp)).ToList()
-                .ToList().ForEach(Console.WriteLine);
+            if (_derivedTimeStamp != null)
+                _allSnapshots
+                    .Where(x => Convert.ToDateTime(x.TimeStamp) == Convert.ToDateTime(_derivedTimeStamp))
+                    .OrderByDescending(x => Convert.ToDateTime(x.TimeStamp)).ToList()
+                    .ToList().ForEach(Console.WriteLine);
+            else
+                _allSnapshots
+                    .OrderByDescending(x => Convert.ToDateTime(x.TimeStamp)).ToList()
+                    .ToList().ForEach(Console.WriteLine);
         }
 
         void GetAllSnapshots()
