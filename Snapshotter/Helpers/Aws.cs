@@ -137,6 +137,37 @@ namespace Cloudoman.AwsTools.Snapshotter.Helpers
             return awsDeviceMappings;
         }
 
+
+        public static void TagVolume(StorageInfo snapshot, string resourceId, string snapshotId, string namePrefix = "Snapshotter BackupName")
+        {
+            // Tag restored volume
+            try
+            {
+                Logger.Info("Tagging restored resource with backup metadata", "TagVolume");
+                var tagRequest = new CreateTagsRequest
+                {
+                    ResourceId = new List<string> { resourceId },
+                    Tag = new List<Tag>{
+                        new Tag {Key = "TimeStamp", Value = snapshot.TimeStamp},
+                        new Tag{Key="HostName", Value=InstanceInfo.HostName},
+                        new Tag{Key="SnapshotId", Value=snapshotId},
+                        new Tag{Key="InstanceID", Value=InstanceInfo.InstanceId},
+                        new Tag{Key="DeviceName", Value=snapshot.DeviceName},
+                        new Tag{Key="Drive", Value=snapshot.Drive},
+                        new Tag{Key="Name", Value=namePrefix + ":" + snapshot.BackupName + " Drive, " + snapshot.Drive},
+                        new Tag{Key="BackupName", Value=snapshot.BackupName},
+                    }
+                };
+
+                Ec2Client.CreateTags(tagRequest);
+
+            }
+            catch (Amazon.EC2.AmazonEC2Exception ex)
+            {
+                Logger.Error("Error tagging volume:" + resourceId, "RestoreVolume");
+                Logger.Error("Exception:" + ex.Message + "\n" + ex.StackTrace, "RestoreVolume");
+            }
+        }
  
 
     }

@@ -38,18 +38,28 @@ namespace Cloudoman.AwsTools.SnapshotterCmd
                         //backupManager.StartBackup();
                         break;
 
-                    case "restore":
-                        var request = new RestoreRequest { 
-                            BackupName = parsed.BackupName, 
-                            TimeStamp = parsed.TimeStamp, 
-                            ForceDetach = parsed.ForceDetach,
-                            WhatIf = parsed.WhatIf,
-                            AttachOnly = parsed.AttachOnly
+                    //case "restore":
+                    //    var request = new RestoreRequest { 
+                    //        BackupName = parsed.BackupName, 
+                    //        TimeStamp = parsed.TimeStamp, 
+                    //        ForceDetach = parsed.ForceDetach,
+                    //        WhatIf = parsed.WhatIf,
+                    //        AttachOnly = parsed.AttachOnly
+                    //    };
+                    //    var restoreManager = new RestoreManager(request);
+                    //    restoreManager.StartRestore();
+                    //    break;
+                    case "restoresnapshots":
+                        var restoreSnapshotsRequest = new RestoreSnapshotsRequest
+                        {
+                            BackupName = parsed.BackupName,
+                            TimeStamp = parsed.TimeStamp,
+                            WhatIf = parsed.WhatIf
                         };
-                        var restoreManager = new RestoreManager(request);
-                        restoreManager.StartRestore();
-                        break;
 
+                        new RestoreSnapshotsService(restoreSnapshotsRequest).StartRestore();
+
+                        break;
                     case "listsnapshots":
                         //var restoreRequest = new RestoreRequest {
                         //    BackupName = parsed.BackupName, 

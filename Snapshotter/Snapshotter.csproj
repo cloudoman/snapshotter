@@ -111,6 +111,7 @@
     <Compile Include="RestoreManager.cs" />
     <Compile Include="Helpers\InstanceInfo.cs" />
     <Compile Include="Services\ListSnapshotsService.cs" />
+    <Compile Include="Services\RestoreSnapshotsService.cs" />
     <Compile Include="Services\SnapshotVolumesService.cs" />
   </ItemGroup>
   <ItemGroup>

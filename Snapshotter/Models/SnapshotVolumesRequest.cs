@@ -11,10 +11,10 @@ namespace Cloudoman.AwsTools.Snapshotter.Models
         public bool WhatIf { get; set; }
     }
 
-    public class TagVolumesRequest
+    public class ListSnapshotsRequest
     {
         public string BackupName { get; set; }
-        public bool WhatIf { get; set; }
+        public string TimeStamp { get; set; }
     }
 
     public class RestoreSnapshotsRequest
@@ -24,6 +24,14 @@ namespace Cloudoman.AwsTools.Snapshotter.Models
         public bool WhatIf { get; set; }
         public bool ForceDetach { get; set; }
     }
+
+    public class TagVolumesRequest
+    {
+        public string BackupName { get; set; }
+        public bool WhatIf { get; set; }
+    }
+
+
 
     public class RestoreTaggedVolumesRequest
     {
@@ -38,9 +46,5 @@ namespace Cloudoman.AwsTools.Snapshotter.Models
         public string BackupName { get; set; }        
     }
 
-    public class ListSnapshotsRequest
-    {
-        public string BackupName { get; set; }
-        public string TimeStamp { get; set; }
-    }
+
 }

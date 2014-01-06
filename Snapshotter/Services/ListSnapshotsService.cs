@@ -10,9 +10,16 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
 {
     public class ListSnapshotsService
     {
-        private string _derivedBackupName;
-        private string _derivedTimeStamp;
+        public string DerivedBackupName { get; private set; }
+        public string DerivedTimeStamp { get; private set; }
         private IEnumerable<SnapshotInfo> _allSnapshots;
+
+        public IEnumerable<SnapshotInfo> SnapshotSet
+        {
+            get { return GetSnapshotSet(); }
+        }
+
+
         private readonly ListSnapshotsRequest _request;
 
         public ListSnapshotsService(ListSnapshotsRequest request)
@@ -41,34 +48,16 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
         /// <returns>BackupName used to tag snapshots</returns>
         void DeriveBackupName()
         {
-            _derivedBackupName = _request.BackupName;
-            if (String.IsNullOrEmpty(_derivedBackupName)) _derivedBackupName = InstanceInfo.ServerName;
-            if (String.IsNullOrEmpty(_derivedBackupName)) _derivedBackupName = InstanceInfo.HostName;
-            Logger.Info("Backup name:" + _derivedBackupName, "ListSnapshotsService.DeriveBackupName");
+            DerivedBackupName = _request.BackupName;
+            if (String.IsNullOrEmpty(DerivedBackupName)) DerivedBackupName = InstanceInfo.ServerName;
+            if (String.IsNullOrEmpty(DerivedBackupName)) DerivedBackupName = InstanceInfo.HostName;
+            Logger.Info("Backup name:" + DerivedBackupName, "ListSnapshotsService.DeriveBackupName");
         }
 
-        /// <summary>
-        /// Defaults to oldest time stamp if timestamp not provided
-        /// </summary>
         void DeriveTimeStamp()
         {
-            _derivedTimeStamp = _request.TimeStamp;
-            if (String.IsNullOrEmpty(_derivedTimeStamp)) _derivedTimeStamp = null;
-            //if (String.IsNullOrEmpty(_derivedTimeStamp)) _derivedTimeStamp = GetOldestSnapshotTimeStamp();
-            //if (_derivedTimeStamp == null)
-            //{
-            //    var message = "No timestamp was explicitly provided. Unable to determine the timestamp of the oldest snapshot. Exitting.";
-            //    Logger.Error(message, "ListSnapshotsService.DeriveTimeStamp");
-            //}
-        }
-
-        string GetOldestSnapshotTimeStamp()
-        {
-            var minDatetime = _allSnapshots.Min(x => Convert.ToDateTime(x.TimeStamp));
-
-            return _allSnapshots
-                        .Where(x => Convert.ToDateTime(x.TimeStamp) == minDatetime)
-                        .Select(x => x.TimeStamp).FirstOrDefault();
+            DerivedTimeStamp = _request.TimeStamp;
+            if (String.IsNullOrEmpty(DerivedTimeStamp)) DerivedTimeStamp = null;
         }
 
 
@@ -79,15 +68,15 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
         public void ListSnapshots()
         {
             Logger.Info("Listing Snaphshots", "ListSnapshotsService.ListSnapshots");
-            Logger.Info("Backup Name:" + _derivedBackupName, "ListSnapshotsService.ListSnapshots");
+            Logger.Info("Backup Name:" + DerivedBackupName, "ListSnapshotsService.ListSnapshots");
 
             // Output Header
             Console.WriteLine(new SnapshotInfo().FormattedHeader);
 
             // Output Snapshots
-            if (_derivedTimeStamp != null)
+            if (DerivedTimeStamp != null)
                 _allSnapshots
-                    .Where(x => Convert.ToDateTime(x.TimeStamp) == Convert.ToDateTime(_derivedTimeStamp))
+                    .Where(x => Convert.ToDateTime(x.TimeStamp) == Convert.ToDateTime(DerivedTimeStamp))
                     .OrderByDescending(x => Convert.ToDateTime(x.TimeStamp)).ToList()
                     .ToList().ForEach(Console.WriteLine);
             else
@@ -100,7 +89,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
         {
             // Find EC2 Snapshots based for given BackupName
             var filters = new List<Filter> {
-                new Filter {Name = "tag:BackupName", Value = new List<string> { _derivedBackupName }},
+                new Filter {Name = "tag:BackupName", Value = new List<string> { DerivedBackupName }},
             };
 
             var request = new DescribeSnapshotsRequest { Filter = filters };
@@ -124,8 +113,31 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
             _allSnapshots =  snapshotsInfo;
             if (_allSnapshots.ToList().Count != 0) return;
 
-            var message = "No snapshots were found for BackupName:" + _derivedBackupName + " and timestamp: " + _derivedTimeStamp + ".Exitting";
+            var message = "No snapshots were found for BackupName:" + DerivedBackupName + " and timestamp: " + DerivedTimeStamp + ".Exitting";
             Logger.Error(message, "ListSnapshotsService.GetAllSnapshots");
         }
+
+        string GetLatestSnapshotTimeStamp()
+        {
+            var newest = _allSnapshots.Max(x => Convert.ToDateTime(x.TimeStamp));
+
+            var something = _allSnapshots
+                        .Where(x => Convert.ToDateTime(x.TimeStamp) == newest)
+                        .Select(x => x.TimeStamp).FirstOrDefault();
+            return something;
+        }
+
+        /// <summary>
+        /// Retrieves a set of snapshots filtered timestamp.
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<SnapshotInfo> GetSnapshotSet()
+        {
+            var timeStamp = DerivedTimeStamp ?? GetLatestSnapshotTimeStamp();
+            return _allSnapshots
+                    .Where(x => Convert.ToDateTime(x.TimeStamp) == Convert.ToDateTime(timeStamp))
+                    .OrderByDescending(x => Convert.ToDateTime(x.TimeStamp)).ToList();
+        }
+
     }
 }
