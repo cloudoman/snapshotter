@@ -99,7 +99,7 @@
     <Compile Include="BackupManager.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Helpers\AwsDeviceMapping.cs" />
-    <Compile Include="Helpers\AwsDevices.cs" />
+    <Compile Include="Helpers\Aws.cs" />
     <Compile Include="Helpers\Logger.cs" />
     <Compile Include="Models\BackupRequest.cs" />
     <Compile Include="Models\RestoreRequest.cs" />

@@ -39,14 +39,14 @@ namespace Cloudoman.AwsTools.Snapshotter.Tests
                     }
                 }
             };
-            var response = InstanceInfo.Ec2Client.ModifyInstanceAttribute(modifyAttrRequest);
+            var response = Aws.Ec2Client.ModifyInstanceAttribute(modifyAttrRequest);
             Console.WriteLine(response.ResponseMetadata);
         }
 
         [TestMethod]
         public void AwsDeviceMappings()
         {
-            var test = AwsDevices.AwsDeviceMappings;
+            var test = Aws.DeviceMappings;
             if (test == null)
             { Console.WriteLine("yes"); };
 

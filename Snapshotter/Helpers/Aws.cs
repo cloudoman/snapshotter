@@ -1,20 +1,31 @@
-﻿using Cloudoman.AwsTools.Snapshotter.Models;
+﻿using Amazon;
+using Amazon.EC2;
+using Cloudoman.AwsTools.Snapshotter.Models;
 using System;
 using System.Management;
 using System.Linq;
 using System.Collections.Generic;
 using Amazon.EC2.Model;
+using Cloudoman.DiskTools;
+
 namespace Cloudoman.AwsTools.Snapshotter.Helpers
 {
-    public static class AwsDevices
+    public static class Aws
     {
-         
-        public static IEnumerable<AwsDeviceMapping> AwsDeviceMappings { get {  return GetAwsDeviceMapping(); }}
+        public static readonly AmazonEC2 Ec2Client;
+
+        static Aws()
+        {
+            var ec2Config = new AmazonEC2Config { ServiceURL = InstanceInfo.Ec2Region };
+            Ec2Client = AWSClientFactory.CreateAmazonEC2Client(ec2Config);
+        }
+
+        public static IEnumerable<AwsDeviceMapping> DeviceMappings { get {  return GetAwsDeviceMapping(); }}
 
 
         public static AwsDeviceMapping GetMapping(string deviceName)
         {
-            var mapping = AwsDeviceMappings.FirstOrDefault(x => x.Device == deviceName);
+            var mapping = DeviceMappings.FirstOrDefault(x => x.Device == deviceName);
             if (mapping != null) return mapping;
             var message = "Could not find disk number for device: " + deviceName + ". Exitting.";
             Logger.Error(message, "RestoreManager.OnlineDrive");
@@ -52,13 +63,13 @@ namespace Cloudoman.AwsTools.Snapshotter.Helpers
 
                 // The WMI field deviceID normally looks like "\\.\PHYSICALDRIVE2"
                 // Extract the disk number only
-                disk = int.Parse(deviceId.Replace(@"\\.\PHYSICALDRIVE", ""));
+                disk = Int32.Parse(deviceId.Replace(@"\\.\PHYSICALDRIVE", ""));
             }
 
             if (disk == 0)
             {
                 var message = "Could not find physical disk for AWS Device: " + awsDevice;
-                Logger.Error(message, "AwsDevices.GetPhysicalDisk");
+                Logger.Error(message, "Aws.GetPhysicalDisk");
                 throw new ApplicationException(message);
             }
             return disk;
@@ -91,7 +102,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Helpers
 
                 // The WMI field deviceID normally looks like "\\.\PHYSICALDRIVE2"
                 // Extract the disk number only
-                disk = int.Parse(deviceId.Replace(@"\\.\PHYSICALDRIVE",""));
+                disk = Int32.Parse(deviceId.Replace(@"\\.\PHYSICALDRIVE",""));
             }
 
             return disk;
@@ -101,7 +112,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Helpers
         static IEnumerable<AwsDeviceMapping> GetAwsDeviceMapping()
         {
             var volumes = InstanceInfo.Volumes;
-            var diskPart = new DiskTools.DiskPart();
+            var diskPart = new DiskPart();
             var mappings = new List<AwsDeviceMapping>();
 
             // Get all offline disks
@@ -122,26 +133,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Helpers
                 Drive = diskPart.DiskDetail(GetDiskFromAwsVolume(x)).Volume.Letter
             });
 
-            //foreach ( var volume in volumes)
-            //{
-            //    var device = volume.Attachment[0].Device;
-            //    var volumeId = volume.VolumeId;
-            //    var diskNumber = GetDiskFromAwsVolume(volume);
 
-            //    var diskDetail = diskPart.DiskDetail(diskNumber);
-            //    var volumeNumber = diskDetail.Volume.Num;
-            //    var drive = diskDetail.Volume.Letter;
-
-            //    var mapping = new AwsDeviceMapping
-            //    {
-            //        Device = device,
-            //        VolumeId = volumeId,
-            //        DiskNumber = diskNumber,
-            //        VolumeNumber = volumeNumber,
-            //        Drive = drive
-            //    };
-            //    mappings.Add(mapping);
-            //}
             return awsDeviceMappings;
         }
 

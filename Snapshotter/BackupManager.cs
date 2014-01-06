@@ -44,7 +44,7 @@ namespace Cloudoman.AwsTools.Snapshotter
             {
                 VolumeId = x.Attachment[0].VolumeId,
                 DeviceName = x.Attachment[0].Device,
-                Drive = AwsDevices.AwsDeviceMappings.Where(d => d.VolumeId == x.VolumeId).Select(d => d.Drive).FirstOrDefault(),
+                Drive = Aws.DeviceMappings.Where(d => d.VolumeId == x.VolumeId).Select(d => d.Drive).FirstOrDefault(),
                 Hostname = InstanceInfo.HostName,
                 BackupName = _derivedBackupName,
                 TimeStamp = timeStamp
@@ -98,7 +98,7 @@ namespace Cloudoman.AwsTools.Snapshotter
                 };
 
                 // Create Snapshot
-                var response = InstanceInfo.Ec2Client.CreateSnapshot(request);
+                var response = Aws.Ec2Client.CreateSnapshot(request);
                 var snapshotId = response.CreateSnapshotResult.Snapshot.SnapshotId;
 
                 TagResource(snapshotId, backupVolumeInfo);
@@ -131,7 +131,7 @@ namespace Cloudoman.AwsTools.Snapshotter
             };
 
             // Tag Snapshot
-            InstanceInfo.Ec2Client.CreateTags(tagRequest);
+            Aws.Ec2Client.CreateTags(tagRequest);
             Logger.Info("HostName " + InstanceInfo.HostName + ":" + InstanceInfo.InstanceId + " Volume Id:" + backupVolumeInfo.VolumeId + " was tagged.", "TagVolume");
         }
 
@@ -179,7 +179,7 @@ namespace Cloudoman.AwsTools.Snapshotter
         public void GetDrivetoAwsDeviceMapping()
         {
             //_volumesInfo.ForEach(x => {
-            //    var something = AwsDevices.GetDriveFromVolumeId(x);
+            //    var something = Aws.GetDriveFromVolumeId(x);
             //    Console.WriteLine(something);
             //});
         }

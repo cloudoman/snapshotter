@@ -14,7 +14,6 @@ namespace Cloudoman.AwsTools.Snapshotter.Helpers
         static readonly WebClient Web = new WebClient();
 
         // Following variables will remain static during operations
-        public static readonly AmazonEC2 Ec2Client;
         public static readonly string InstanceId;
         public static readonly string Ec2Region;
         public static readonly string ServerName;
@@ -31,7 +30,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Helpers
             Ec2Region = GetEc2Region();
 
             var ec2Config = new AmazonEC2Config { ServiceURL = Ec2Region };
-            Ec2Client = AWSClientFactory.CreateAmazonEC2Client(ec2Config);
+            //Aws.Ec2Client = AWSClientFactory.CreateAmazonEC2Client(ec2Config);
             ServerName = GetInstanceTag("Name");
             AvailabilityZone = GetAvailabilityZone();
         }
@@ -60,7 +59,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Helpers
                     Value = new List<string> {x}
                 }
             };
-            var tags = Ec2Client.DescribeTags(new DescribeTagsRequest {Filter = filters}).DescribeTagsResult.ResourceTag;
+            var tags = Aws.Ec2Client.DescribeTags(new DescribeTagsRequest {Filter = filters}).DescribeTagsResult.ResourceTag;
             return tags.Count == 0 ? null : tags[0].Value;
         };
 
@@ -74,7 +73,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Helpers
                 }
             };
 
-            var volumes = Ec2Client.DescribeVolumes(request).DescribeVolumesResult.Volume;
+            var volumes = Aws.Ec2Client.DescribeVolumes(request).DescribeVolumesResult.Volume;
 
             if (volumes.Count != 0) return volumes;
             Logger.Info("No attached volumes were found", "GetMyVolumes");
@@ -92,7 +91,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Helpers
             // Return Devices not attached to local instance
             var request = new DescribeInstancesRequest {InstanceId = new List<string>{InstanceId}};
             return allDevices.Except(
-                    Ec2Client.DescribeInstances(request)
+                    Aws.Ec2Client.DescribeInstances(request)
                         .DescribeInstancesResult
                         .Reservation.First()
                         .RunningInstance.First()

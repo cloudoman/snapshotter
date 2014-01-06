@@ -78,7 +78,7 @@ namespace Cloudoman.AwsTools.Snapshotter
             };
 
             var request = new DescribeSnapshotsRequest { Filter = filters };
-            var snapshots = InstanceInfo.Ec2Client.DescribeSnapshots(request).DescribeSnapshotsResult.Snapshot;
+            var snapshots = Aws.Ec2Client.DescribeSnapshots(request).DescribeSnapshotsResult.Snapshot;
 
             // Generate List<SnapshotInfo> from EC2 Snapshots
             // Get Snapshot meta data from AWS resource Tags
@@ -105,7 +105,7 @@ namespace Cloudoman.AwsTools.Snapshotter
             };
 
             var request = new DescribeVolumesRequest { Filter = filters };
-            var response = InstanceInfo.Ec2Client.DescribeVolumes(request);
+            var response = Aws.Ec2Client.DescribeVolumes(request);
             if (response.DescribeVolumesResult.Volume.Count == 0)
             {
                 Logger.Info("No existing volumes were found for given backupName:" + _backupName, "RestoreManager.GetVolumeSet");
@@ -255,7 +255,7 @@ namespace Cloudoman.AwsTools.Snapshotter
             if (volume != null)
             {
                 // Find the Windows physical disk number attached to the AWS device (snapshot.DeviceName)
-                var mapping = AwsDevices.GetMapping(storageInfo.DeviceName);
+                var mapping = Aws.GetMapping(storageInfo.DeviceName);
                 diskNumber = mapping.DiskNumber;
 
                 if (_request.ForceDetach)
@@ -320,7 +320,7 @@ namespace Cloudoman.AwsTools.Snapshotter
                     }
                 };
 
-                var response = InstanceInfo.Ec2Client.ModifyInstanceAttribute(modifyAttrRequest);
+                var response = Aws.Ec2Client.ModifyInstanceAttribute(modifyAttrRequest);
             }
             catch (Amazon.EC2.AmazonEC2Exception ex)
             {
@@ -345,7 +345,7 @@ namespace Cloudoman.AwsTools.Snapshotter
                 };
 
 
-                var volume = InstanceInfo.Ec2Client.CreateVolume(createVolumeRequest).CreateVolumeResult.Volume;
+                var volume = Aws.Ec2Client.CreateVolume(createVolumeRequest).CreateVolumeResult.Volume;
                 volumeId = volume.VolumeId;
                 Logger.Info("Created Volume:" + volumeId, "RestoreVolume");
 
@@ -365,7 +365,7 @@ namespace Cloudoman.AwsTools.Snapshotter
             for (int i=1; i<=retry & loop; i++)
             {
                 var describeVolumeRequest = new DescribeVolumesRequest { VolumeId = new List<string> { volumeId } };
-                var response = InstanceInfo.Ec2Client.DescribeVolumes(describeVolumeRequest);
+                var response = Aws.Ec2Client.DescribeVolumes(describeVolumeRequest);
                 var newVolume = response.DescribeVolumesResult.Volume.FirstOrDefault();
                 status = newVolume.Status;
 
@@ -408,7 +408,7 @@ namespace Cloudoman.AwsTools.Snapshotter
                     }
                 };
 
-                InstanceInfo.Ec2Client.CreateTags(tagRequest);
+                Aws.Ec2Client.CreateTags(tagRequest);
 
             }
             catch (Amazon.EC2.AmazonEC2Exception ex)
@@ -448,7 +448,7 @@ namespace Cloudoman.AwsTools.Snapshotter
                     Force = true
                 };
 
-                var response = InstanceInfo.Ec2Client.DetachVolume(detachRequest);
+                var response = Aws.Ec2Client.DetachVolume(detachRequest);
                 Logger.Info("Attachment Status:" + response.DetachVolumeResult.Attachment.Status, "RestoreVolume.DetachVolume");
                 Logger.Info("Detached Volume:" + volumeId + " Device:" + device, "RestoreVolume.DetachVolume");
             }
@@ -522,7 +522,7 @@ namespace Cloudoman.AwsTools.Snapshotter
                     Device = storageInfo.DeviceName
                 };
 
-                var result = InstanceInfo.Ec2Client.AttachVolume(attachRequest).AttachVolumeResult;
+                var result = Aws.Ec2Client.AttachVolume(attachRequest).AttachVolumeResult;
                 Logger.Info("Attached Volume:" + volumeId, "RestoreVolume");
                 Logger.Info("Attachment result:" + result.Attachment.AttachTime, "RestoreVolume");
             }
@@ -568,7 +568,7 @@ namespace Cloudoman.AwsTools.Snapshotter
         string AttachmentStatus (string volumeId)
         {
             
-            var volume = InstanceInfo.Ec2Client.DescribeVolumes(new DescribeVolumesRequest { VolumeId = new List<string>{volumeId}})
+            var volume = Aws.Ec2Client.DescribeVolumes(new DescribeVolumesRequest { VolumeId = new List<string>{volumeId}})
                                      .DescribeVolumesResult.Volume.FirstOrDefault();
 
             if (volume == null)
