@@ -6,7 +6,7 @@ namespace Cloudoman.AwsTools.SnapshotterCmd.Powerargs
     public class MyArgs
     {
         [ArgRequired]
-        [ArgDescription("Operation is either 'backup', 'restore', 'listsnapshots' or 'listvolumes'")]
+        [ArgDescription("One of: 'snapshotvolumes', 'restoresnapshots', 'tagvolumes', 'restorevolumes','listvolumes' or 'listsnapshots'")]
         public Operation Operation { get; set; }
 
         [ArgDescription("A name for your backup. Defaults to this EC2 instance's 'name' tag or hostname if unspecified.This name is an AWS resource tag used to either tag or find your snapshots")]

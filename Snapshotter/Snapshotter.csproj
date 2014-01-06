@@ -104,11 +104,13 @@
     <Compile Include="Models\BackupRequest.cs" />
     <Compile Include="Models\RestoreRequest.cs" />
     <Compile Include="Models\SnapshotInfo.cs" />
+    <Compile Include="Models\SnapshotVolumesRequest.cs" />
     <Compile Include="Models\StorageInfo.cs" />
     <Compile Include="Models\VolumeInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RestoreManager.cs" />
     <Compile Include="Helpers\InstanceInfo.cs" />
+    <Compile Include="Services\SnapshotVolumesService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

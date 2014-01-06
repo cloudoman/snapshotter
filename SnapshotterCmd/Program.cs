@@ -1,6 +1,7 @@
 ﻿using System;
 using Cloudoman.AwsTools.Snapshotter;
 using Cloudoman.AwsTools.Snapshotter.Models;
+using Cloudoman.AwsTools.Snapshotter.Services;
 using Cloudoman.AwsTools.SnapshotterCmd.Powerargs;
 using PowerArgs;
 
@@ -25,15 +26,18 @@ namespace Cloudoman.AwsTools.SnapshotterCmd
                 switch (operation)
                 {
                     case "backup":
-                        var backupRequest = new BackupRequest { 
+
+                        var snapRequest = new SnapshotVolumesRequest { 
                             BackupName = parsed.BackupName, 
                             WhatIf = parsed.WhatIf, 
-                            TagOnly = parsed.TagOnly 
                         };
 
-                        var backupManager = new BackupManager(backupRequest);
-                        backupManager.StartBackup();
+                        new SnapshotVolumeService(snapRequest).StartBackup();
+
+                        //var backupManager = new BackupManager(backupRequest);
+                        //backupManager.StartBackup();
                         break;
+
                     case "restore":
                         var request = new RestoreRequest { 
                             BackupName = parsed.BackupName, 

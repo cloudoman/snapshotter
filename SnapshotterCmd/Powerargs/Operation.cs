@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Amazon.RDS.Model;
 using PowerArgs;
 
 namespace Cloudoman.AwsTools.SnapshotterCmd.Powerargs
@@ -13,10 +15,18 @@ namespace Cloudoman.AwsTools.SnapshotterCmd.Powerargs
         readonly string _operation;
 
         // List valid options
-        static readonly IEnumerable<string> Options = new List<string>{"backup", "restore", "listsnapshots","listvolumes"};
+        static readonly IEnumerable<string> Options = new List<string> {
+            "snapshotvolumes", 
+            "restoresnapshots", 
+            "tagvolumes", 
+            "restorevolumes", 
+            "listvolumes", 
+            "listsnapshots"
+        };
 
         // Format into readable help message
-        private const string HelpMessage = "Invalid Operation Specified. Must be 'backup' or 'restore' or 'list'";
+        private static readonly string HelpMessage = "Invalid, Operation Specified. Must be:" +
+                                            String.Join(",", Options.ToArray());
 
         // Constructor
         public Operation(string operation)

@@ -16,8 +16,17 @@ namespace Cloudoman.AwsTools.Snapshotter.Helpers
         // Following variables will remain static during operations
         public static readonly string InstanceId;
         public static readonly string Ec2Region;
+
+        /// <summary>
+        /// The EC2 'Name' resource tag of this server
+        /// </summary>
         public static readonly string ServerName;
+
         public static readonly string AvailabilityZone;
+
+        /// <summary>
+        /// The physical HostName of this server
+        /// </summary>
         public static readonly string HostName = Dns.GetHostName();
 
         // Volumes and FreeDevices can change during operations
