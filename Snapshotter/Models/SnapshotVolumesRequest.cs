@@ -31,8 +31,6 @@ namespace Cloudoman.AwsTools.Snapshotter.Models
         public bool WhatIf { get; set; }
     }
 
-
-
     public class RestoreTaggedVolumesRequest
     {
         public string BackupName { get; set; }

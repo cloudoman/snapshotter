@@ -54,7 +54,8 @@ namespace Cloudoman.AwsTools.SnapshotterCmd
                         {
                             BackupName = parsed.BackupName,
                             TimeStamp = parsed.TimeStamp,
-                            WhatIf = parsed.WhatIf
+                            WhatIf = parsed.WhatIf,
+                            ForceDetach = parsed.ForceDetach
                         };
 
                         new RestoreSnapshotsService(restoreSnapshotsRequest).StartRestore();
