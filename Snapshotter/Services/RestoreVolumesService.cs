@@ -59,8 +59,9 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
                     Hostname = x.Hostname,
                     TimeStamp = x.TimeStamp
                 };
-                
-                restoreSnapshotService.CreateDrive(storageInfo, x.VolumeId);  
+
+                // Attach volume as drive, ensure it's not deleted on instance termination
+                restoreSnapshotService.CreateDrive(storageInfo, x.VolumeId, deleteOnTerminate: false);  
             });
 
             Logger.Info("Restore Volume Ended", "RestoreVolumesService.StartRestore");

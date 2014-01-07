@@ -34,6 +34,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
             var response = new SnapshotVolumeService(snapshotVolumesRequest);
             var volumesInfo  = response.AttachedVolumesInfo;
 
+            var maxtimeStamp = volumesInfo.Max(x => x.AwsTimeStamp);
 
             volumesInfo.ForEach(x =>
             {
@@ -45,7 +46,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
                     DeviceName = x.DeviceName,
                     Drive = x.Drive,
                     Hostname = x.Hostname,
-                    TimeStamp = Convert.ToDateTime(x.AwsTimeStamp).ToString("r")
+                    TimeStamp = Convert.ToDateTime(maxtimeStamp).ToString("r")
                 };
 
                 Aws.TagVolume(storageInfo, x.VolumeId,"This volume was not created from snapshot");

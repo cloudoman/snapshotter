@@ -63,7 +63,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
 
                     var volumeId = CreateVolume(x);
                     Aws.TagVolume(x,volumeId,x.SnapshotId);
-                    CreateDrive(x, volumeId);
+                    CreateDrive(x, volumeId,deleteOnTerminate:true);
                 }
             });
             
@@ -128,7 +128,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
             return volumeId;
         }
 
-        public void CreateDrive(StorageInfo storageInfo, string volumeId)
+        public void CreateDrive(StorageInfo storageInfo, string volumeId, bool deleteOnTerminate)
         {
             var diskNumber = 0;
 
