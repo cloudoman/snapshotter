@@ -98,7 +98,7 @@
   <ItemGroup>
     <Compile Include="BackupManager.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="Helpers\AwsDeviceMapping.cs" />
+    <Compile Include="Models\AwsDeviceMapping.cs" />
     <Compile Include="Helpers\Aws.cs" />
     <Compile Include="Helpers\Logger.cs" />
     <Compile Include="Models\BackupRequest.cs" />
@@ -111,8 +111,11 @@
     <Compile Include="RestoreManager.cs" />
     <Compile Include="Helpers\InstanceInfo.cs" />
     <Compile Include="Services\ListSnapshotsService.cs" />
+    <Compile Include="Services\ListTaggedVolumesService.cs" />
     <Compile Include="Services\RestoreSnapshotsService.cs" />
+    <Compile Include="Services\RestoreTaggedVolumesServicecs.cs" />
     <Compile Include="Services\SnapshotVolumesService.cs" />
+    <Compile Include="Services\SyncService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

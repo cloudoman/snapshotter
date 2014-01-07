@@ -30,6 +30,10 @@ namespace Cloudoman.AwsTools.Snapshotter.Helpers
         public static readonly string HostName = Dns.GetHostName();
 
         // Volumes and FreeDevices can change during operations
+
+        /// <summary>
+        /// List of volumes attached to the local EC2 instance excluding EBS boot volume
+        /// </summary>
         public static List<Volume> Volumes {get { return GetMyVolumes(); }}
         public static IEnumerable<string> FreeDevices { get { return GetFreeDevices(); } }
 
@@ -84,7 +88,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Helpers
 
             var volumes = Aws.Ec2Client.DescribeVolumes(request).DescribeVolumesResult.Volume;
 
-            if (volumes.Count != 0) return volumes;
+            if (volumes.Count != 0) return volumes.Where(v => v.Attachment[0].Device != "/dev/sda1").ToList();
             Logger.Info("No attached volumes were found", "GetMyVolumes");
             return null;
         }

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using AlphaShadow.Options;
 using Amazon.EC2.Model;
 using Cloudoman.AwsTools.Snapshotter.Helpers;
 using Cloudoman.AwsTools.Snapshotter.Models;
@@ -57,6 +55,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
                 Console.WriteLine(x.ToString());
 
                 // Restore each snapshot in the set
+                // and attach to a Windows drive
                 if (!_request.WhatIf)
                 {
                     // Create New Volume and Tag it
@@ -164,6 +163,9 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
 
                 if (_request.ForceDetach)
                 {
+                    // Flush all writes to disk
+                    new SyncService(storageInfo.Drive);
+
                     // Offline Disk assocated with required device
                     OfflineDisk(mapping.DiskNumber);
                     DetachVolume(mapping.VolumeId, mapping.Device);
