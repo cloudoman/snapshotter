@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Amazon.EC2.Model;
 using Cloudoman.AwsTools.Snapshotter.Helpers;
 using Cloudoman.AwsTools.Snapshotter.Models;
@@ -121,10 +120,9 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
         {
             var newest = _allSnapshots.Max(x => Convert.ToDateTime(x.TimeStamp));
 
-            var something = _allSnapshots
+            return _allSnapshots
                         .Where(x => Convert.ToDateTime(x.TimeStamp) == newest)
                         .Select(x => x.TimeStamp).FirstOrDefault();
-            return something;
         }
 
         /// <summary>

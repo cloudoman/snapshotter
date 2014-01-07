@@ -62,7 +62,6 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
                     Logger.Info("Restore Volume:" + x.SnapshotId, "RestoreManager.StartRestore");
 
                     var volumeId = CreateVolume(x);
-                    //TagVolume(x, volumeId);
                     Aws.TagVolume(x,volumeId,x.SnapshotId);
                     CreateDrive(x, volumeId);
                 }

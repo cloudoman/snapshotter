@@ -1,7 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Reflection;
-using Cloudoman.AwsTools.Snapshotter;
 using Cloudoman.AwsTools.Snapshotter.Models;
 using Cloudoman.AwsTools.Snapshotter.Services;
 using Cloudoman.AwsTools.SnapshotterCmd.Powerargs;
@@ -34,22 +31,8 @@ namespace Cloudoman.AwsTools.SnapshotterCmd
                         };
 
                         new SnapshotVolumeService(snapRequest).StartBackup();
-
-                        //var backupManager = new BackupManager(backupRequest);
-                        //backupManager.StartBackup();
                         break;
 
-                    //case "restore":
-                    //    var request = new RestoreRequest { 
-                    //        BackupName = parsed.BackupName, 
-                    //        TimeStamp = parsed.TimeStamp, 
-                    //        ForceDetach = parsed.ForceDetach,
-                    //        WhatIf = parsed.WhatIf,
-                    //        AttachOnly = parsed.AttachOnly
-                    //    };
-                    //    var restoreManager = new RestoreManager(request);
-                    //    restoreManager.StartRestore();
-                    //    break;
                     case "restoresnapshots":
                         var restoreSnapshotsRequest = new RestoreSnapshotsRequest
                         {
@@ -60,16 +43,9 @@ namespace Cloudoman.AwsTools.SnapshotterCmd
                         };
 
                         new RestoreSnapshotsService(restoreSnapshotsRequest).StartRestore();
-
                         break;
-                    case "listsnapshots":
-                        //var restoreRequest = new RestoreRequest {
-                        //    BackupName = parsed.BackupName, 
-                        //    TimeStamp = parsed.TimeStamp,
-                        //    AttachOnly = parsed.AttachOnly
-                        //};
 
-                        //new RestoreManager(restoreRequest).ListSnapshots();
+                    case "listsnapshots":
                         var listSnapshotsRequest = new ListSnapshotsRequest
                         {
                             BackupName = parsed.BackupName,
@@ -77,26 +53,28 @@ namespace Cloudoman.AwsTools.SnapshotterCmd
                         };
                         new ListSnapshotsService(listSnapshotsRequest).ListSnapshots();
                         break;
+
                     case "listvolumes":
-                        var listTaggedVolumeRequest = new ListTaggedVolumesRequest
+                        var listVolumesRequest = new ListVolumesRequest
                         {
                             BackupName = parsed.BackupName,
                             TimeStamp = parsed.TimeStamp
                         };
 
-                        new ListTaggedVolumesService(listTaggedVolumeRequest).ListTaggedVolumes();
+                        new ListVolumesService(listVolumesRequest).ListVolumes();
                         break;
 
-                    //case "listvolumes":
-                    //    var restoreRequest2 = new RestoreRequest
-                    //    {
-                    //        BackupName = parsed.BackupName,
-                    //        TimeStamp = parsed.TimeStamp,
-                    //        AttachOnly = parsed.AttachOnly
-                    //    };
+                    case "restoreVolumes":
+                        var restoreVolumeRequest = new RestoreVolumesRequest
+                        {
+                            BackupName = parsed.BackupName,
+                            TimeStamp = parsed.TimeStamp,
+                            ForceDetach = parsed.ForceDetach,
+                            WhatIf = parsed.WhatIf
+                        };
 
-                    //    new RestoreManager(restoreRequest2).ListVolumes();
-                    //    break;
+                        new RestoreVolumesService(restoreVolumeRequest).StartRestore();
+                        break;
                 }
 
             }

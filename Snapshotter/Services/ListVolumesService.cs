@@ -7,15 +7,20 @@ using Cloudoman.AwsTools.Snapshotter.Models;
 
 namespace Cloudoman.AwsTools.Snapshotter.Services
 {
-    public class ListTaggedVolumesService
+    public class ListVolumesService
     {
-        private readonly ListTaggedVolumesRequest _request;
+        private readonly ListVolumesRequest _request;
         public string DerivedBackupName { get; private set; }
         public string DerivedTimeStamp { get; private set; }
 
         private List<VolumeInfo> _allVolumes;
 
-        public ListTaggedVolumesService(ListTaggedVolumesRequest request)
+        public IEnumerable<VolumeInfo> VolumeSet
+        {
+            get { return GetVolumeSet(); }
+        }
+
+        public ListVolumesService(ListVolumesRequest request)
         {
             // Save request 
             _request = request;
@@ -70,17 +75,17 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
             if (_allVolumes.ToList().Count != 0) return;
 
             var message = "No volumes were found for BackupName:" + DerivedBackupName + " and timestamp: " + DerivedTimeStamp + ".Exitting";
-            Logger.Error(message, "ListTaggedVolumesService.GetAllVolumes");
+            Logger.Error(message, "ListVolumesService.GetAllVolumes");
         }
 
         /// <summary>
         /// Lists snapshots matching timestamp passed in via constructor.
         /// List all available snapshots when timestamp was omitted
         /// </summary>
-        public void ListTaggedVolumes()
+        public void ListVolumes()
         {
-            Logger.Info("Listing Volumes", "ListTaggedVolumesService.ListTaggedVolumes");
-            Logger.Info("Backup Name:" + DerivedBackupName, "ListTaggedVolumesService.ListTaggedVolumes");
+            Logger.Info("Listing Volumes", "ListVolumesService.ListVolumes");
+            Logger.Info("Backup Name:" + DerivedBackupName, "ListVolumesService.ListVolumes");
 
             // Output Header
             Console.WriteLine(new VolumeInfo().FormattedHeader);
@@ -95,6 +100,27 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
                 _allVolumes
                     .OrderByDescending(x => Convert.ToDateTime(x.TimeStamp)).ToList()
                     .ToList().ForEach(Console.WriteLine);
+        }
+
+        string GetLatestVolumeTimeStamp()
+        {
+            var newest = _allVolumes.Max(x => Convert.ToDateTime(x.TimeStamp));
+
+            return _allVolumes
+                        .Where(x => Convert.ToDateTime(x.TimeStamp) == newest)
+                        .Select(x => x.TimeStamp).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Retrieves a set of volumes filtered by timestamp.
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<VolumeInfo> GetVolumeSet()
+        {
+            var timeStamp = DerivedTimeStamp ?? GetLatestVolumeTimeStamp();
+            return _allVolumes
+                    .Where(x => Convert.ToDateTime(x.TimeStamp) == Convert.ToDateTime(timeStamp))
+                    .OrderByDescending(x => Convert.ToDateTime(x.TimeStamp)).ToList();
         }
     }
 }

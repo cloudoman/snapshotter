@@ -1,6 +1,6 @@
 ﻿namespace Cloudoman.AwsTools.Snapshotter.Models
 {
-    public class SnapshotVolumesRequest
+    public class TagVolumesRequest
     {
         public string BackupName { get; set; }
         public bool WhatIf { get; set; }

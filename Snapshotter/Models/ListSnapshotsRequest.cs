@@ -1,8 +1,8 @@
 ﻿namespace Cloudoman.AwsTools.Snapshotter.Models
 {
-    public class SnapshotVolumesRequest
+    public class ListSnapshotsRequest
     {
         public string BackupName { get; set; }
-        public bool WhatIf { get; set; }
+        public string TimeStamp { get; set; }
     }
 }
