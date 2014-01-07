@@ -11,4 +11,5 @@ This tool enables two scenarios:
 
 2. **Creates EBS Snapshots of non boot volumes**: In the event of failure, it simplifies creating volumes using snapshots and re-attaching the volumes to an instance while preserving the correct drive configurations.
 
+Please refer to the wiki (https://github.com/cloudoman/snapshotter/wiki) for further details.
 ***
