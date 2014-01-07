@@ -1,7 +1,8 @@
 Snapshotter
 ===========
 
-AWS EBS Snapshot Backup Tool for Windows. Please not that this tool is designed to run on the EC2 instance whose volumes need to be snapshotted.
+AWS EBS Snapshot Backup Tool for Windows. Please note that this tool is designed to run on the EC2 instance whose volume(s) need to be snapshotted. As a best practice, please ensure your instances are launched with an IAM instance profile. The temporary IAM credentials assigned to the instance will be used for all AWS API calls.
+
 
 The tool provides two primary backup like capabilities:
 
