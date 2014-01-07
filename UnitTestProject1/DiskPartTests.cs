@@ -4,6 +4,8 @@ using Cloudoman.AwsTools.Snapshotter.Helpers;
 using Cloudoman.DiskTools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Cloudoman.DiskTools.Models;
+using Microsoft.Win32;
+
 namespace Cloudoman.AwsTools.Snapshotter.Tests
 {
     [TestClass]
@@ -89,6 +91,13 @@ namespace Cloudoman.AwsTools.Snapshotter.Tests
             var detail = _diskPart.DiskDetail(0).Volume.Num;
             Console.WriteLine(detail);
             
+        }
+
+        [TestMethod]
+
+        public void CreateEulaRegKey()
+        {
+            Microsoft.Win32.Registry.CurrentUser.CreateSubKey("Software\\Sysinternals\\Sync").SetValue("EulaAccepted","1",RegistryValueKind.DWord);
         }
     }
 }

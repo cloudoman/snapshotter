@@ -163,7 +163,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
                 if (_request.ForceDetach)
                 {
                     // Flush all writes to disk
-                    new SyncService(storageInfo.Drive);
+                    new SyncService(storageInfo.Drive).SyncNow();
 
                     // Offline Disk assocated with required device
                     OfflineDisk(mapping.DiskNumber);
