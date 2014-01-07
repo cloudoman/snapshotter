@@ -12,3 +12,4 @@ The tool provides two primary backup like capabilities:
 
 
 
+Please refer to the wiki(https://github.com/cloudoman/snapshotter/wiki) for moe details.
