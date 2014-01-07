@@ -7,5 +7,6 @@
         public string TimeStamp { get; set; }
         public string BackupName { get; set; }
         public string Hostname { get; set; }
+        public string AwsTimeStamp { get; set; }
     }
 }

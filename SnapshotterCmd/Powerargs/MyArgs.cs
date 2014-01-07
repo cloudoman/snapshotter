@@ -21,11 +21,6 @@ namespace Cloudoman.AwsTools.SnapshotterCmd.Powerargs
         [ArgDescription("Show what would happen if backup or restore was run. Default is '0' or 'False'. Use '1' or 'True' for testing.")]
         public bool WhatIf { get; set; }
 
-        [ArgDescription("Backup operation only tags attached volumes with metadata. Does not create snapshots")]
-        public bool TagOnly { get; set; }
-
-        [ArgDescription("Restore operation only attaches existing volumes if any. Does not create volume from snapshots")]
-        public bool AttachOnly { get; set; }
 
     }
 

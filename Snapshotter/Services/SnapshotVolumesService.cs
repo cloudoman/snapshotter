@@ -18,7 +18,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
         List<VolumeInfo> _volumesInfo;
 
         readonly SnapshotVolumesRequest _request;
-
+        public List<VolumeInfo> AttachedVolumesInfo { get { return EnumerateAttachedVolumes(); } private set{} }
 
         public SnapshotVolumeService(SnapshotVolumesRequest request)
         {
@@ -29,7 +29,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
             DeriveBackupName();
 
             // Find volumes to backup
-            EnumerateAttachedVolumes();
+            _volumesInfo =  EnumerateAttachedVolumes();
         }
 
         /// <summary>
@@ -47,25 +47,29 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
             Logger.Info("Backup name:" + _derivedBackupName, "BackupManager");
         }
 
-        void EnumerateAttachedVolumes()
+        List<VolumeInfo> EnumerateAttachedVolumes()
         {
             // Get attached volumes to me via AWS API
             var volumes = InstanceInfo.Volumes;
+            List<VolumeInfo> volumesInfo;
 
             // Generate a timestamp to tag snapshots
             var timeStamp = AWSSDKUtils.FormattedCurrentTimestampRFC822;
 
             // Generate additional volume metadata to save using resources tags
             // Exclude Root EBS volume from list
-            _volumesInfo = volumes.Where(v => v.Attachment[0].Device != "/dev/sda1").Select(x => new VolumeInfo
+            volumesInfo = volumes.Where(v => v.Attachment[0].Device != "/dev/sda1").Select(x => new VolumeInfo
             {
                 VolumeId = x.Attachment[0].VolumeId,
                 DeviceName = x.Attachment[0].Device,
                 Drive = Aws.DeviceMappings.Where(d => d.VolumeId == x.VolumeId).Select(d => d.Drive).FirstOrDefault(),
                 Hostname = InstanceInfo.HostName,
                 BackupName = _derivedBackupName,
-                TimeStamp = timeStamp
+                TimeStamp = timeStamp,
+                AwsTimeStamp = Convert.ToDateTime(x.CreateTime).ToString("r")
             }).ToList();
+
+            return volumesInfo;
         }
 
         bool CheckBackupPreReqs()

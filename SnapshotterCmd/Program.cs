@@ -11,7 +11,6 @@ namespace Cloudoman.AwsTools.SnapshotterCmd
     {
         static void Main(string[] args)
         {
-
             // Create Snapshots
             try
             {
@@ -64,7 +63,7 @@ namespace Cloudoman.AwsTools.SnapshotterCmd
                         new ListVolumesService(listVolumesRequest).ListVolumes();
                         break;
 
-                    case "restoreVolumes":
+                    case "restorevolumes":
                         var restoreVolumeRequest = new RestoreVolumesRequest
                         {
                             BackupName = parsed.BackupName,
@@ -75,6 +74,18 @@ namespace Cloudoman.AwsTools.SnapshotterCmd
 
                         new RestoreVolumesService(restoreVolumeRequest).StartRestore();
                         break;
+
+                    case "tagvolumes":
+                        var tagVolumesRequest = new TagVolumesRequest
+                        {
+                            BackupName = parsed.BackupName,
+                            WhatIf = parsed.WhatIf
+                        };
+
+                        new TagVolumesService(tagVolumesRequest).TagVolumes();
+                        break;
+
+
                 }
 
             }

@@ -100,10 +100,8 @@
     <Compile Include="Models\AwsDeviceMapping.cs" />
     <Compile Include="Helpers\Aws.cs" />
     <Compile Include="Helpers\Logger.cs" />
-    <Compile Include="Models\BackupRequest.cs" />
     <Compile Include="Models\ListSnapshotsRequest.cs" />
     <Compile Include="Models\ListVolumesRequest.cs" />
-    <Compile Include="Models\RestoreRequest.cs" />
     <Compile Include="Models\RestoreSnapshotsRequest.cs" />
     <Compile Include="Models\RestoreVolumesRequest.cs" />
     <Compile Include="Models\SnapshotInfo.cs" />
@@ -119,6 +117,7 @@
     <Compile Include="Services\RestoreVolumesService.cs" />
     <Compile Include="Services\SnapshotVolumesService.cs" />
     <Compile Include="Services\SyncService.cs" />
+    <Compile Include="Services\TagVolumesService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

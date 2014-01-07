@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Cloudoman.AwsTools.Snapshotter.Helpers;
 using Cloudoman.AwsTools.Snapshotter.Models;
-
+using Amazon.EC2.Model;
 
 namespace Cloudoman.AwsTools.Snapshotter.Services
 {
@@ -54,8 +54,14 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
 
         void GetAllVolumes()
         {
-            // Get attached volumes from AWS API
-            var volumes = InstanceInfo.Volumes;
+            // Find EC2 Snapshots based for given BackupName
+            var filters = new List<Filter> {
+                new Filter {Name = "tag:BackupName", Value = new List<string> { DerivedBackupName }},
+            };
+
+            var request = new DescribeVolumesRequest { Filter = filters };
+            var volumes = Aws.Ec2Client.DescribeVolumes(request).DescribeVolumesResult.Volume;
+
 
             // Generate metadata for attached volumes as VolumeInfo objects
             var volumesInfo = new List<VolumeInfo>();
