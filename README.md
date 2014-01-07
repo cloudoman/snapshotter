@@ -1,15 +1,14 @@
 Snapshotter
 ===========
 
-AWS EBS Snapshot Backup Tool for Windows. Please note that this tool is designed to run on the EC2 instance whose volume(s) need to be snapshotted. As a best practice, please ensure your instances are launched with an IAM instance profile. The temporary IAM credentials assigned to the instance will be used for all AWS API calls.
+Please note that this tool works for Windows volumes created from exactly *ONE* windows physical disk. STRIPED VOLUMES, THEREFORE, WILL NOT WORK HERE
 
+# Overview
 
-The tool provides two primary backup like capabilities:
+This tool enables two scenarios:
 
-1. Create snapshots of all non-boot EBS volumes and restore them.
-2. Remember all EBS volume attachments to an EC2 instance. In case of instance failure, this tools provides the capability to automatically attached to the previously attached EBS volumes.
+1. **Remembers all EBS attachment configurations**: In the event of an instance failure, a new instance will be able to attach to the appropriate volumes using the same EBS volumes, AWS EBS Devices (For /dev/xvdf etc) and online the volumes as drives using the same drive letter as before.
 
+2. **Creates EBS Snapshots of non boot volumes**: In the event of failure, it simplifies creating volumes using snapshots and re-attaching the volumes to an instance while preserving the correct drive configurations.
 
-
-
-Please refer to the wiki(https://github.com/cloudoman/snapshotter/wiki) for more details.
+***
