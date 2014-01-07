@@ -77,7 +77,7 @@ namespace Cloudoman.AwsTools.SnapshotterCmd
                         };
                         new ListSnapshotsService(listSnapshotsRequest).ListSnapshots();
                         break;
-                    case "listtaggedvolumes":
+                    case "listvolumes":
                         var listTaggedVolumeRequest = new ListTaggedVolumesRequest
                         {
                             BackupName = parsed.BackupName,

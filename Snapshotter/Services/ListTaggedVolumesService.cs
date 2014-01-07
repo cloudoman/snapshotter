@@ -79,11 +79,11 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
         /// </summary>
         public void ListTaggedVolumes()
         {
-            Logger.Info("Listing Snaphshots", "ListSnapshotsService.ListSnapshots");
-            Logger.Info("Backup Name:" + DerivedBackupName, "ListSnapshotsService.ListSnapshots");
+            Logger.Info("Listing Volumes", "ListTaggedVolumesService.ListTaggedVolumes");
+            Logger.Info("Backup Name:" + DerivedBackupName, "ListTaggedVolumesService.ListTaggedVolumes");
 
             // Output Header
-            Console.WriteLine(new SnapshotInfo().FormattedHeader);
+            Console.WriteLine(new VolumeInfo().FormattedHeader);
 
             // Output Snapshots
             if (DerivedTimeStamp != null)
