@@ -364,9 +364,9 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
             Logger.Info("Disk was taken offline", "RestoreManager.OfflineDisk");
         }
 
-        public static void SetDeleteOnTermination(string DeviceName, bool deleteOnTermination)
+        public static void SetDeleteOnTermination(string deviceName, bool deleteOnTermination)
         {
-            Logger.Info("SetDeleteOnTermination " + DeviceName + " to " + deleteOnTermination, "SetDeleteOnTermination");
+            Logger.Info("SetDeleteOnTermination " + deviceName + " to " + deleteOnTermination, "SetDeleteOnTermination");
 
             try
             {
@@ -376,8 +376,8 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
                     BlockDeviceMapping = new List<InstanceBlockDeviceMappingParameter>
                     {
                         new InstanceBlockDeviceMappingParameter{
-                            DeviceName="xvdf",
-                            Ebs = new InstanceEbsBlockDeviceParameter{DeleteOnTermination = deleteOnTermination,VolumeId="vol-c32e2eea"}
+                            DeviceName=deviceName,
+                            Ebs = new InstanceEbsBlockDeviceParameter{DeleteOnTermination = deleteOnTermination}
                         }
                     }
                 };
@@ -386,7 +386,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
             }
             catch (Amazon.EC2.AmazonEC2Exception ex)
             {
-                Logger.Error("Error setting DeleteOnTermination flag for:" + DeviceName, "SetDeleteOnTermination");
+                Logger.Error("Error setting DeleteOnTermination flag for:" + deviceName, "SetDeleteOnTermination");
                 Logger.Error("Exception:" + ex.Message + "\n" + ex.StackTrace, "RestoreVolume");
             }
 
