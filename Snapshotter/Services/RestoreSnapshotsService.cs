@@ -364,7 +364,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
             Logger.Info("Disk was taken offline", "RestoreManager.OfflineDisk");
         }
 
-        void SetDeleteOnTermination(string DeviceName, bool deleteOnTermination)
+        public static void SetDeleteOnTermination(string DeviceName, bool deleteOnTermination)
         {
             Logger.Info("SetDeleteOnTermination " + DeviceName + " to " + deleteOnTermination, "SetDeleteOnTermination");
 
@@ -377,7 +377,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
                     {
                         new InstanceBlockDeviceMappingParameter{
                             DeviceName="xvdf",
-                            Ebs = new InstanceEbsBlockDeviceParameter{DeleteOnTermination = true,VolumeId="vol-c32e2eea"}
+                            Ebs = new InstanceEbsBlockDeviceParameter{DeleteOnTermination = deleteOnTermination,VolumeId="vol-c32e2eea"}
                         }
                     }
                 };

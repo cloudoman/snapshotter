@@ -50,9 +50,12 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
                 };
 
                 Aws.TagVolume(storageInfo, x.VolumeId,"This volume was not created from snapshot");
+
+                var device = Aws.DeviceMappings.First(m => m.VolumeId == x.VolumeId).Device;
+                RestoreSnapshotsService.SetDeleteOnTermination(device, deleteOnTermination: false);
             });
 
-           
+          
         }
     }
 }
