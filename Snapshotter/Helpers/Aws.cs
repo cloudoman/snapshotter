@@ -117,11 +117,21 @@ namespace Cloudoman.AwsTools.Snapshotter.Helpers
 
             // Get all offline disks
             var offlineDisks = diskPart.ListDisk().Where(x => x.Status == "Offline"); ;
-
+            
             if (offlineDisks.Count() > 0 )
             {
                 var message = "All disk need to be online in order for mapping an AWS Device to a Windows volume. Please online all disks. Exitting.";
                 Logger.Error(message,"AWSDevices.GetAwsDeviceMapping");
+            }
+
+            var noDriveVolumes = diskPart.ListVolume().Where(x => x.Letter == "null" && x.Num !=0);
+
+            if (noDriveVolumes.Count() > 0)
+            {
+                noDriveVolumes.Select(x => x.Num).ToList().ForEach(x => Logger.Warning("Volume " + x + "does not have a drive letter", "AWS.GetAwsDeviceMapping"));
+
+                var message = "All volumes must have drive letters assigned. Please assign drive letter or detach from instance. Exitting.";
+                Logger.Error(message, "AWSDevices.GetAwsDeviceMapping");
             }
 
             var awsDeviceMappings = volumes.Select(x => new AwsDeviceMapping
