@@ -3,6 +3,7 @@ using Cloudoman.AwsTools.Snapshotter.Models;
 using Cloudoman.AwsTools.Snapshotter.Services;
 using Cloudoman.AwsTools.SnapshotterCmd.Powerargs;
 using PowerArgs;
+using Cloudoman.AwsTools.Snapshotter.Helpers;
 
 
 namespace Cloudoman.AwsTools.SnapshotterCmd
@@ -11,6 +12,9 @@ namespace Cloudoman.AwsTools.SnapshotterCmd
     {
         static void Main(string[] args)
         {
+            dynamic something = InstanceInfo.Ec2Region;
+            something = Cloudoman.AwsTools.Snapshotter.Helpers.Aws.Ec2Client;
+
             // Create Snapshots
             try
             {

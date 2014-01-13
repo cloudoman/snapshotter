@@ -60,7 +60,8 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
             };
 
             var request = new DescribeVolumesRequest { Filter = filters };
-            var volumes = Aws.Ec2Client.DescribeVolumes(request).DescribeVolumesResult.Volume;
+            var response = Aws.Ec2Client.DescribeVolumes(request).DescribeVolumesResult;
+            var volumes = response.Volume;
 
 
             // Generate metadata for attached volumes as VolumeInfo objects

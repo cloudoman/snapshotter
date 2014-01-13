@@ -12,12 +12,14 @@ namespace Cloudoman.AwsTools.Snapshotter.Helpers
 {
     public static class Aws
     {
-        public static readonly AmazonEC2 Ec2Client;
+        public static AmazonEC2 Ec2Client { get { return _ec2Client; } }
+        public static AmazonEC2 _ec2Client;
+
 
         static Aws()
         {
             var ec2Config = new AmazonEC2Config { ServiceURL = InstanceInfo.Ec2Region };
-            Ec2Client = AWSClientFactory.CreateAmazonEC2Client(ec2Config);
+            _ec2Client = AWSClientFactory.CreateAmazonEC2Client(ec2Config);
         }
 
         public static IEnumerable<AwsDeviceMapping> DeviceMappings { get {  return GetAwsDeviceMapping(); }}
