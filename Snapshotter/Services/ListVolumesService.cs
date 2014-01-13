@@ -81,8 +81,9 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
             _allVolumes = volumesInfo;
             if (_allVolumes.ToList().Count != 0) return;
 
-            var message = "No volumes were found for BackupName:" + DerivedBackupName + " and timestamp: " + DerivedTimeStamp + ".Exitting";
-            Logger.Error(message, "ListVolumesService.GetAllVolumes");
+            var message = "No volumes were found for BackupName:" + DerivedBackupName + " and timestamp: " + DerivedTimeStamp;
+            Console.WriteLine(message);
+            Logger.Info(message, "ListVolumesService.GetAllVolumes");
         }
 
         /// <summary>
