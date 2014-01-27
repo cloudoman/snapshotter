@@ -113,7 +113,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
             if (_allSnapshots.ToList().Count != 0) return;
 
             var message = "No snapshots were found for BackupName:" + DerivedBackupName + " and timestamp: " + DerivedTimeStamp + ".Exitting";
-            Logger.Error(message, "ListSnapshotsService.GetAllSnapshots");
+            Logger.Info(message, "ListSnapshotsService.GetAllSnapshots");
         }
 
         string GetLatestSnapshotTimeStamp()
