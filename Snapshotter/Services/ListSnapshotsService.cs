@@ -118,6 +118,7 @@ namespace Cloudoman.AwsTools.Snapshotter.Services
 
         string GetLatestSnapshotTimeStamp()
         {
+            if ( (_allSnapshots == null )|| (_allSnapshots.Count()==0) ) return null;
             var newest = _allSnapshots.Max(x => Convert.ToDateTime(x.TimeStamp));
 
             return _allSnapshots
